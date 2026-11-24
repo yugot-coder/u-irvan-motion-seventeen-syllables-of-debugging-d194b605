@@ -49,6 +49,15 @@ def main() -> None:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(haiku)
+    # Read-back verification: the file on disk must be exactly the
+    # haiku we chose, not a truncated or re-encoded copy. If the write
+    # was corrupted, fail loudly instead of shipping a wrong entry.
+    with open(path, "r", encoding="utf-8") as f:
+        written = f.read()
+    assert written == haiku, "entry.txt on disk differs from the chosen haiku"
+    written_lines = written.split("\n")
+    assert len(written_lines) == 3, "entry.txt must be exactly three lines"
+    assert 1 <= len(written) <= 200, "entry.txt must be 1 to 200 characters"
     print(haiku)
 
 
